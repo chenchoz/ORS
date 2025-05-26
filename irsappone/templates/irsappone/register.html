@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 bg-[url('https://example.com/pattern.svg')] bg-fixed">
+
+<section class="bg-gray-50 dark:bg-gray-900">
+  <div class="flex flex-col items-center justify-center px-4 py-8 mx-auto md:h-screen lg:py-0">
+      <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+          <!-- <img class="w-8 h-8 mr-2" src="{% static 'images/logo.svg' %}" alt="logo"> -->
+          ATS Occurrence Recording System
+      </a>
+      <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 transform transition-transform duration-300 hover:scale-[1.01]">
+          <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                  Create your account
+              </h1>
+              <form class="space-y-4 md:space-y-6" method="POST" action="">
+                  {% csrf_token %}
+
+                  <!-- Error display - only shows after POST -->
+                  {% if form.errors and request.method == 'POST' %}
+                  <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-100">
+                      {% if form.non_field_errors %}
+                          <p><strong>Registration failed!</strong> Please correct the errors below.</p>
+                      {% else %}
+                          <p><strong>Registration failed!</strong> Please check your information.</p>
+                      {% endif %}
+                  </div>
+                  {% endif %}
+
+                  {% for field in form %}
+                      <div class="relative">
+                          <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                              {{ field.label }}
+                          </label>
+                          <input type="{{ field.field.widget.input_type }}" 
+                                 name="{{ field.html_name }}" 
+                                 id="{{ field.id_for_label }}" 
+                                 class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+                                 {% if field.errors and request.method == 'POST' %}border-red-500 dark:border-red-400{% endif %}" 
+                                 placeholder="{{ field.label }}" 
+                                 {% if field.field.required %}required{% endif %}>
+                          
+                          <!-- Field errors (only shown after submission) -->
+                          {% if field.errors and request.method == 'POST' %}
+                          <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                              {{ field.errors.0 }}
+                          </p>
+                          {% endif %}
+                      </div>
+                  {% endfor %}
+
+                
+                  <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition duration-200 ease-in-out transform hover:-translate-y-0.5">
+                      <span id="btn-text">Register</span>
+                      <span id="btn-spinner" class="hidden ml-2">
+                          <svg class="animate-spin h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                      </span>
+                  </button>
+
+                  <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                      Already have an account? 
+                      <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Login here</a>
+                  </p>
+              </form>
+          </div>
+      </div>
+  </div>
+</section>
+
+<script>
+    // Password toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInputs = document.querySelectorAll('input[type="password"]');
+        passwordInputs.forEach(passwordInput => {
+            const passwordToggle = document.createElement('span');
+            passwordToggle.className = 'absolute right-3 top-[42px] cursor-pointer';
+            passwordToggle.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            `;
+            
+            const inputWrapper = passwordInput.parentNode;
+            inputWrapper.classList.add('relative');
+            inputWrapper.appendChild(passwordToggle);
+            
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+            });
+        });
+
+        // Form submission loading state
+        document.querySelector('form')?.addEventListener('submit', function() {
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            if (btnText && btnSpinner) {
+                btnText.classList.add('hidden');
+                btnSpinner.classList.remove('hidden');
+            }
+        });
+
+        // Clear errors when user starts typing
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                const errorContainer = document.querySelector('.bg-red-100');
+                if (errorContainer) {
+                    errorContainer.style.display = 'none';
+                }
+                this.classList.remove('border-red-500', 'dark:border-red-400');
+                
+                // Also hide field-specific errors
+                const fieldError = this.parentNode.querySelector('.text-red-600');
+                if (fieldError) {
+                    fieldError.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
